@@ -34,3 +34,5 @@ typechain
 /Truffle/build
 /Truffle/data
 data/
+
+.idea/
