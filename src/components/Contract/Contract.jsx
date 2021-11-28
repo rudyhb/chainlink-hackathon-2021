@@ -12,7 +12,7 @@ export default function Contract() {
   const { Moralis } = useMoralis();
   const { contractName, networks, abi } = contractInfo;
   const [responses, setResponses] = useState({});
-  const contractAddress = networks[1337].address;
+  const contractAddress = networks[80001].address;
 
   /**Live query */
   const { data } = useMoralisQuery("Events", (query) => query, [], {
