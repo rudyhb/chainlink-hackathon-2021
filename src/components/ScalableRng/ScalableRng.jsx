@@ -2,11 +2,12 @@ import {Button, Card, Input, Form} from "antd";
 import contractInfo from "contracts/contractInfo.json";
 import Address from "components/Address/Address";
 import {useMoralis} from "react-moralis";
-import {useState, useEffect} from "react";
+import {useEffect} from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import Loading from "../Loading";
 import sha1 from 'sha1';
 import {FaTimesCircle, FaExclamationTriangle} from "react-icons/fa";
+import Account from "../Account";
 
 const createRng = (rngSeed, salt) => {
   return sha1(JSON.stringify({
@@ -90,14 +91,11 @@ function RngRequestInput({
 }
 
 export default function ScalableRng() {
-  const {Moralis} = useMoralis();
+  const {Moralis, isAuthenticated} = useMoralis();
   const {contractName, networks, abi} = contractInfo;
   const contractAddress = networks[80001].address;
 
   const [requests, setRequests] = useLocalStorage('rngRequests', [{}], true);
-
-  const [connected, setConnected] = useState(true);
-  console.log('connected: ', connected)
 
   const removeRequest = requestIndex => {
     setRequests(req => {
@@ -129,12 +127,9 @@ export default function ScalableRng() {
         };
         try {
           const committedIndex = await Moralis.executeFunction({awaitReceipt: true, ...options});
-          setConnected(true);
           request.committedIndex = committedIndex;
         } catch (e) {
-          if (e && /make sure to call/i.test(e.message)) {
-            setConnected(false);
-          }
+          console.error(e);
         }
       }
       // for some reason need to wait a few seconds before using Moralis
@@ -167,12 +162,9 @@ export default function ScalableRng() {
         let result;
         try {
           result = await Moralis.executeFunction({awaitReceipt: true, ...options});
-          setConnected(true);
         } catch (e) {
           result = {};
-          if (e && /make sure to call/i.test(e.message)) {
-            setConnected(false);
-          }
+          console.error(e);
         }
         const success = result[0];
         const rng = result[1];
@@ -232,7 +224,7 @@ export default function ScalableRng() {
           borderRadius: "0.5rem",
         }}
       >
-        {!connected && (<Card
+        {!isAuthenticated && (<Card
           title={`Not connected!`}
           size="medium"
           style={{marginBottom: "20px"}}
@@ -243,23 +235,12 @@ export default function ScalableRng() {
           }}>
             <FaExclamationTriangle size={25} color='gold'/>
           </div>
-          <p>For the best experience make sure to connect on the top
-            right corner.</p>
+          <p style={{
+            marginBottom: "15px"
+          }}>Please connect your wallet to continue.</p>
+          <Account/>
         </Card>)}
-        {/*<Form.Provider*/}
-        {/*  onFormFinish={async (name, {forms}) => {*/}
-        {/*    console.log('forms', forms)*/}
-        {/*    console.log('name', name)*/}
-        {/*    const params = forms[name].getFieldsValue();*/}
 
-        {/*    console.log('params', params)*/}
-
-        {/*    setRequests(req => {*/}
-        {/*      req[name].salt = params.salt;*/}
-        {/*      return req;*/}
-        {/*    });*/}
-        {/*  }}*/}
-        {/*>*/}
         {requests.map((req, i) => (
           !req ? null : <div
             key={i}
@@ -270,58 +251,7 @@ export default function ScalableRng() {
               <RngRequestInput onSubmit={onFormFinish} index={i} salt={req.salt}/>}
           </div>
         ))}
-        {/*{displayedContractFunctions &&*/}
-        {/*displayedContractFunctions.map((item, key) => (*/}
-        {/*  <Card*/}
-        {/*    title={`${key + 1}. ${item?.name}`}*/}
-        {/*    size="small"*/}
-        {/*    style={{marginBottom: "20px"}}*/}
-        {/*  >*/}
-        {/*    <Form layout="vertical" name={`${item.name}`}>*/}
-        {/*      {item.inputs.map((input, key) => (*/}
-        {/*        <Form.Item*/}
-        {/*          label={`${input.name} (${input.type})`}*/}
-        {/*          name={`${input.name}`}*/}
-        {/*          required*/}
-        {/*          style={{marginBottom: "15px"}}*/}
-        {/*        >*/}
-        {/*          <Input placeholder="input placeholder"/>*/}
-        {/*        </Form.Item>*/}
-        {/*      ))}*/}
-        {/*      <Form.Item style={{marginBottom: "5px"}}>*/}
-        {/*        <Text style={{display: "block"}}>*/}
-        {/*          {responses[item.name]?.result &&*/}
-        {/*          `Response: ${JSON.stringify(responses[item.name]?.result)}`}*/}
-        {/*        </Text>*/}
-        {/*        <Button*/}
-        {/*          type="primary"*/}
-        {/*          htmlType="submit"*/}
-        {/*          loading={responses[item?.name]?.isLoading}*/}
-        {/*        >*/}
-        {/*          {item.stateMutability === "view" ? "Read🔎" : "Transact💸"}*/}
-        {/*        </Button>*/}
-        {/*      </Form.Item>*/}
-        {/*    </Form>*/}
-        {/*  </Card>*/}
-        {/*))}*/}
-        {/*</Form.Provider>*/}
       </Card>
-      {/*<Card*/}
-      {/*  title={"Contract Events"}*/}
-      {/*  size="large"*/}
-      {/*  style={{*/}
-      {/*    width: "40%",*/}
-      {/*    boxShadow: "0 0.5rem 1.2rem rgb(189 197 209 / 20%)",*/}
-      {/*    border: "1px solid #e7eaf3",*/}
-      {/*    borderRadius: "0.5rem",*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  {data.map((event, key) => (*/}
-      {/*    <Card title={"Transfer event"} size="small" style={{marginBottom: "20px"}}>*/}
-      {/*      {getEllipsisTxt(event.attributes.transaction_hash, 14)}*/}
-      {/*    </Card>*/}
-      {/*  ))}*/}
-      {/*</Card>*/}
     </div>
   );
 }

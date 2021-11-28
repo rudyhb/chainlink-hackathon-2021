@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import useChain from "hooks/useChain";
-import { useMoralisDapp } from "providers/MoralisDappProvider/MoralisDappProvider";
-import { Menu, Dropdown, Button } from "antd";
-import { DownOutlined } from "@ant-design/icons";
-import { AvaxLogo, PolygonLogo, BSCLogo, ETHLogo } from "./Logos";
+import {useMoralisDapp} from "providers/MoralisDappProvider/MoralisDappProvider";
+import {Menu, Dropdown, Button} from "antd";
+import {DownOutlined} from "@ant-design/icons";
+import {PolygonLogo} from "./Logos";
 
 const styles = {
   item: {
@@ -70,7 +70,7 @@ const menuItems = [
   {
     key: "0x13881",
     value: "Mumbai",
-    icon: <PolygonLogo />,
+    icon: <PolygonLogo/>,
   },
   // {
   //   key: "0xa86a",
@@ -80,8 +80,8 @@ const menuItems = [
 ];
 
 function Chains() {
-  const { switchNetwork } = useChain();
-  const { chainId } = useMoralisDapp();
+  const {switchNetwork} = useChain();
+  const {chainId} = useMoralisDapp();
   const [selected, setSelected] = useState({});
 
   useEffect(() => {
@@ -100,10 +100,10 @@ function Chains() {
     <Menu onClick={handleMenuClick}>
       {menuItems.map((item) => (
         <Menu.Item key={item.key} icon={item.icon} style={styles.item}>
-          <span style={{ marginLeft: "5px" }}>{item.value}</span>
+          <span style={{marginLeft: "5px"}}>{item.value}</span>
         </Menu.Item>
       ))}
-    </Menu> 
+    </Menu>
   );
 
   return (
@@ -112,10 +112,10 @@ function Chains() {
         <Button
           key={selected?.key}
           icon={selected?.icon}
-          style={{ ...styles.button, ...styles.item }}
+          style={{...styles.button, ...styles.item}}
         >
-          <span style={{ marginLeft: "5px" }}>{selected?.value}</span>
-          <DownOutlined />
+          <span style={{marginLeft: "5px"}}>{selected?.value}</span>
+          <DownOutlined/>
         </Button>
       </Dropdown>
     </div>
